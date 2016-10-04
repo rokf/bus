@@ -1,0 +1,14 @@
+[package]
+name = "bus"
+version = "0.1.0"
+authors = ["Rok Fajfar <snewix7@gmail.com>"]
+
+[dependencies]
+hyper = "*"
+json = "*"
+requests = "*"
+csv = "*"
+
+[dependencies.gtk]
+version = "*"
+features = ["v3_10"]
