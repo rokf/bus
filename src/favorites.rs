@@ -84,7 +84,7 @@ pub fn update_fav_box(fav_ref : &Vec<(String,String)>, fav_box_ref : &ListBox, e
     for child in fav_box_ref.get_children() {
         fav_box_ref.remove(&child);
     }
-    for f in fav_ref {
+    for (i,f) in fav_ref.iter().enumerate() {
         append_favorite(fav_box_ref, &f.0, &f.1, e1, e2);
     }
     fav_box_ref.show_all();

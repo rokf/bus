@@ -200,7 +200,7 @@ fn main() {
     // fav_box.set_vexpand(true);
     fav_scroll.add(&fav_box);
     // fav_scroll.set_vexpand(true);
-    sidebar.pack_start(&fav_scroll, false, false, 0);
+    sidebar.pack_start(&fav_scroll, true, true, 0);
 
     bx.add(&sidebar);
     window.add(&bx);
