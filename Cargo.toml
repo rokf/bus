@@ -11,4 +11,4 @@ csv = "*"
 
 [dependencies.gtk]
 version = "*"
-features = ["v3_10"]
+features = ["v3_16"]

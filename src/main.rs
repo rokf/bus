@@ -23,6 +23,7 @@ use gtk::{
     WindowType,
     HeaderBar,
     Box,
+    CheckButton,
     ScrolledWindow,
     ListBox,
     ListBoxRow,
@@ -147,7 +148,8 @@ fn main() {
     );
 
     let button = Button::new_from_icon_name("media-playlist-shuffle-symbolic", 1);
-    let fav_button = Button::new_from_icon_name("emblem-favorite-symbolic", 1);
+    let fav_button = Button::new_from_icon_name("bookmark-new-symbolic", 1);
+    let fav_marks = Button::new_from_icon_name("user-bookmarks-symbolic",1);
 
     let s_entry1 = Entry::new();
     let s_entry2 = Entry::new();
@@ -174,6 +176,7 @@ fn main() {
     header.pack_start(&button);
     header.pack_start(&s_entry2);
     header.pack_end(&fav_button);
+    header.pack_end(&fav_marks);
     window.set_titlebar(Some(&header));
 
     let scrl = ScrolledWindow::new(None,None);
@@ -242,6 +245,68 @@ fn main() {
             let text2 = s_entry2.get_text().unwrap();
             favcell.push((text1, text2));
             favorites::update_fav_box(&favcell, &fav_box, &s_entry1, &s_entry2);
+        }
+    });
+
+
+    // first I had the new element creation lines here
+    let favorites_window = gtk::Window::new(WindowType::Toplevel);
+    let favorites_window_scroll = ScrolledWindow::new(None,None);
+    let favorites_box = Box::new(Orientation::Vertical, 0);
+    favorites_window.set_title("Priljubljene");
+    favorites_window.set_default_size(400,500);
+
+    let fwb = Box::new(Orientation::Vertical,0);
+    let fsb = Button::new_from_icon_name("emblem-ok-symbolic",1);
+
+    favorites_window_scroll.add(&favorites_box);
+    favorites_window_scroll.set_vexpand(true);
+    fwb.add(&favorites_window_scroll); fwb.add(&fsb);
+    favorites_window.add(&fwb);
+
+    fsb.connect_clicked({
+        let mut favs = favs.clone();
+        let favorites_box = favorites_box.clone();
+        let s_entry1 = s_entry1.clone(); // from the main window
+        let s_entry2 = s_entry2.clone();
+        let fav_box = fav_box.clone();
+        move |_| {
+            let mut f_borrow = favs.borrow_mut();
+            for (i,c) in favorites_box.get_children().iter().enumerate() {
+                let cc = c.clone().downcast::<CheckButton>().unwrap();
+                if cc.get_active() == false {
+                    f_borrow.remove(i);
+                }
+            }
+            favorites::update_fav_box(&f_borrow, &fav_box, &s_entry1, &s_entry2);
+        }
+    });
+
+    fav_marks.connect_clicked({
+        let mut favs = favs.clone();
+        let favorites_window = favorites_window.clone();
+        let favorites_window_scroll = favorites_window_scroll.clone();
+        let favorites_box = favorites_box.clone();
+
+        move |_| { // the clicked closure
+            for child in favorites_box.get_children() { favorites_box.remove(&child); }
+            let mut f_borrow = favs.borrow_mut();
+            for (i,v) in f_borrow.iter().enumerate() {
+                // let containment_box = Box::new(Orientation::Horizontal,0);
+                let cb = CheckButton::new_with_label(&format!("{} > {}",&v.0,&v.1));
+                cb.set_active(true);
+                favorites_box.add(&cb);
+                println!("{}",&v.0);
+            }
+            favorites_window.show_all();
+        }
+    });
+
+    favorites_window.connect_delete_event({
+        let favorites_window = favorites_window.clone();
+        move |_,_| {
+            favorites_window.hide();
+            Inhibit(true)
         }
     });
 

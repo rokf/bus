@@ -29,7 +29,7 @@ pub fn check_for_file(filename : &str) -> bool {
                 Ok(f) => {
                     println!("Has been created.");
                 },
-                Error => {
+                error => {
                     println!("Couldn't be created.");
                 }
             }
@@ -46,7 +46,9 @@ pub fn load_favorites(fav_ref : Rc<RefCell<Vec<(String,String)>>>, filename : &s
     for record in rdr.decode() {
         let (from, to): (String, String) = record.unwrap();
         println!("loading: {} {}",from,to);
-        mutfavr.push((from, to));
+        if (from != "" && to != "") {
+            mutfavr.push((from, to));
+        }
     }
 }
 
